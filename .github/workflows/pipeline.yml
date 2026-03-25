@@ -86,7 +86,9 @@ jobs:
         run: python check_threshold.py
 
       - name: Mock build
-        run: echo "Building Docker image for Run ID: $(cat model_info.txt)"
+        run: |
+           echo "Building Docker image for Run ID: $(cat model_info.txt)"
 
       - name: Docker build
-        run: docker build --build-arg RUN_ID=$(cat model_info.txt) -t mock-model:latest .
+        run: |
+           docker build --build-arg RUN_ID=$(cat model_info.txt) -t mock-model:latest .
