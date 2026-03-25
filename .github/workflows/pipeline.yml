@@ -1,0 +1,92 @@
+name: Validate and Deploy Model
+
+on:
+  push:
+    branches:
+      - "**"
+  workflow_dispatch:
+    inputs:
+      force_accuracy:
+        description: "Optional accuracy override like 0.80 or 0.90"
+        required: false
+        default: ""
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    env:
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+      FORCE_ACCURACY: ${{ github.event.inputs.force_accuracy }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Pull data with DVC
+        run: |
+          echo "Simulating dvc pull"
+          mkdir -p data
+
+      - name: Train model and log to MLflow
+        run: python train.py
+
+      - name: Verify model_info.txt exists
+        run: |
+          test -f model_info.txt
+          echo "model_info.txt found"
+          cat model_info.txt
+
+      - name: Upload model info artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-info
+          path: model_info.txt
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: validate
+
+    env:
+      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download model info artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: model-info
+
+      - name: Show model_info.txt
+        run: cat model_info.txt
+
+      - name: Check MLflow threshold
+        run: python check_threshold.py
+
+      - name: Mock build
+        run: echo "Building Docker image for Run ID: $(cat model_info.txt)"
+
+      - name: Docker build
+        run: docker build --build-arg RUN_ID=$(cat model_info.txt) -t mock-model:latest .
