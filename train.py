@@ -32,7 +32,8 @@ def main():
         run_id = run.info.run_id
 
         with open("model_info.txt", "w") as f:
-            f.write(run_id)
+            f.write(f"{run_id}\n")
+            f.write(f"{accuracy}\n")
 
         print(f"Run ID: {run_id}")
         print(f"Accuracy: {accuracy:.4f}")
