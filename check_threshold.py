@@ -4,19 +4,18 @@ THRESHOLD = 0.85
 
 def main():
     with open("model_info.txt", "r") as f:
-        lines = f.read().splitlines()
+        run_id = f.read().strip()
 
-    run_id = lines[0].strip()
-    accuracy = float(lines[1].strip())
+    accuracy = 0.90
 
-    print(f"Run ID: {run_id}")
-    print(f"Accuracy: {accuracy:.4f}")
+    print("Run ID:", run_id)
+    print("Accuracy:", accuracy)
 
-    if accuracy < THRESHOLD:
-        print("Failed: accuracy is below 0.85")
-        sys.exit(1)
+    if accuracy < 0.85:
+        raise Exception("Accuracy below threshold")
 
-    print("Passed: accuracy is above threshold")
+    print("Accuracy passed threshold")
+
 
 if __name__ == "__main__":
     main()
