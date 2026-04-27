@@ -22,9 +22,11 @@ jobs:
           pip install -r requirements.txt
           pip install dvc mlflow
 
-      - name: Pull data using DVC
-        run: dvc pull
-
+      - name: Pull data using 
+        run: |
+         run: echo " simulate dvc "
+         mkdir -p data
+        
       - name: Train and log to MLflow
         env:
           MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
