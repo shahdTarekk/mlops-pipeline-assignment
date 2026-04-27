@@ -19,6 +19,9 @@ jobs:
       env:
         MLFLOW_TRACKING_URI: ${{secrets.MLFLOW_TRACKING_URI}}
       run: python train.py 
+    - name: save model info
+      run: |
+       echo $MLFLOW_RUN_ID > model-info.txt
     - name: upload artfiact
       uses: actions/upload-artifact@v4
       with:
