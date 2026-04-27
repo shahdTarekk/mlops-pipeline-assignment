@@ -14,7 +14,7 @@ jobs:
        python-version: "3.10"
     - name: install dependcise 
       run: |
-       pip install -r requriments.txt 
+       pip install -r requirements.txt 
     - name: train and log
       env:
         MLFLOW_TRACKING_URI: ${{secrets.MLFLOW_TRACKING_URI}}
@@ -23,14 +23,15 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
        name: model-info
-       path: model-info.txt
+       path: model_info.txt
   deploy: 
    runs-on: ubuntu-latest
+   needs: validate
    steps:
     - name: checkout code
-      uses: actions/chechout@v4
+      uses: actions/checkout@v4
     - name: setup
-      uses: actions/setup-pthon@v5
+      uses: actions/setup-python@v5
       with:
        python-version: "3.10"
     - name: requriments 
@@ -42,12 +43,12 @@ jobs:
         name: model-info
     - name: check 
       env:
-        MLFLOW_TRACKING_URI: ${{secrets.MLFLWO_TRACKING_URI}}
+        MLFLOW_TRACKING_URI: ${{secrets.MLFLOW_TRACKING_URI}}
       run: python check_threshold.py
 
     - name: simulate
       run: |
-       echo "Builing docker iamge ::$(cat.model_info.txt)"
+       echo "Builing docker iamge ::$(cat  model_info.txt)"
     
     
     
