@@ -24,7 +24,7 @@ jobs:
 
       - name: Pull data using 
         run: |
-         run: echo "simulate dvc"
+         echo "simulate dvc"
          mkdir -p data
         
       - name: Train and log to MLflow
